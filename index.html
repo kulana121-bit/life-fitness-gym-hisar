@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Life Fitness Gym Hisar — Stronger starts here.</title>
+    <style>
+      :root {
+        --black: #000;
+        --graphite: #111;
+        --graphite-2: #171717;
+        --white: #fff;
+        --grey: #86868b;
+        --grey-2: #4a4a4e;
+        --yellow: #f5c400;
+        --line: rgba(255, 255, 255, 0.12);
+        --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter",
+          "Helvetica Neue", Helvetica, Arial, sans-serif;
+        --gutter: 22px;
+        --max: 1120px;
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+      body {
+        margin: 0;
+        background: var(--black);
+        color: var(--white);
+        font-family: var(--sans);
+        font-size: 17px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+      img { display: block; max-width: 100%; }
+      a { color: inherit; text-decoration: none; }
+      h1, h2, h3, p { margin: 0; }
+      :focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; border-radius: 8px; }
+      .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
+      .eyebrow {
+        font-size: 13px; font-weight: 600; letter-spacing: 0.14em;
+        text-transform: uppercase; color: var(--yellow);
+      }
+      .lead { color: var(--grey); font-size: 19px; }
+
+      /* nav */
+      .nav {
+        position: sticky; top: 0; z-index: 60;
+        background: rgba(0, 0, 0, 0.6);
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        backdrop-filter: saturate(180%) blur(20px);
+        border-bottom: 1px solid var(--line);
+      }
+      .nav__in {
+        max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter);
+        height: 56px; display: flex; align-items: center; gap: 18px;
+      }
+      .mark { font-weight: 800; letter-spacing: -0.02em; font-size: 16px; }
+      .mark span { color: var(--yellow); }
+      .nav__links { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+      .nav__links a {
+        font-size: 14px; color: #d6d6d8; padding: 11px 12px; min-height: 44px;
+        display: inline-flex; align-items: center;
+      }
+      .nav__links a:hover { color: #fff; }
+      .nav__links a.pill, .nav__links a.pill:hover { color: #140f00; min-height: 44px; padding: 0 18px; }
+      .mark { min-height: 44px; display: inline-flex; align-items: center; }
+      .pill {
+        background: var(--yellow); color: #140f00; font-weight: 700; font-size: 14px;
+        border-radius: 999px; padding: 0 18px; min-height: 36px;
+        display: inline-flex; align-items: center;
+      }
+      @media (max-width: 520px) {
+        .nav__links a.nav__hide { display: none; }
+      }
+
+      /* buttons */
+      .btns { display: flex; flex-wrap: wrap; gap: 12px; }
+      .btn {
+        display: inline-flex; align-items: center; justify-content: center;
+        min-height: 48px; padding: 0 24px; border-radius: 999px;
+        font-size: 16px; font-weight: 600; border: 1px solid transparent;
+        transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+      }
+      .btn:active { transform: scale(0.97); }
+      .btn--y { background: var(--yellow); color: #140f00; }
+      .btn--y:hover { background: #ffd51f; }
+      .btn--ghost { border-color: rgba(255, 255, 255, 0.35); color: #fff; }
+      .btn--ghost:hover { background: rgba(255, 255, 255, 0.1); }
+
+      /* hero */
+      .hero { position: relative; height: 100svh; min-height: 560px; overflow: hidden; }
+      .hero__media { position: absolute; inset: 0; will-change: transform; }
+      .hero__media img { width: 100%; height: 100%; object-fit: cover; }
+      .hero__scrim {
+        position: absolute; inset: 0;
+        background:
+          linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.25) 35%, rgba(0,0,0,0.85) 85%, #000 100%);
+      }
+      .hero__in {
+        position: relative; z-index: 2; height: 100%;
+        display: flex; flex-direction: column; justify-content: flex-end;
+        padding-bottom: clamp(48px, 9vh, 96px);
+      }
+      .hero h1 {
+        font-size: clamp(46px, 11vw, 112px); font-weight: 800;
+        letter-spacing: -0.045em; line-height: 0.95; margin: 14px 0 0;
+      }
+      .hero__sub { margin-top: 16px; font-size: clamp(17px, 2.4vw, 22px); color: #d6d6d8; }
+      .rating {
+        display: inline-flex; align-items: center; gap: 8px;
+        border: 1px solid rgba(245, 196, 0, 0.5); color: var(--yellow);
+        border-radius: 999px; padding: 7px 14px; font-size: 14px; font-weight: 600;
+        background: #141100;
+      }
+      .hero .btns { margin-top: 26px; }
+
+      /* reveal */
+      .rev { opacity: 0; transform: translateY(26px); transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.22,1,0.36,1); }
+      .rev.in { opacity: 1; transform: none; }
+
+      /* section base */
+      .sec { padding: clamp(80px, 13vh, 150px) 0; }
+      .sec h2 {
+        font-size: clamp(34px, 6vw, 68px); font-weight: 800;
+        letter-spacing: -0.04em; line-height: 1.02;
+      }
+      .sec__head p.lead { margin-top: 16px; max-width: 620px; }
+
+      /* exploded view */
+      .ex { position: relative; height: 320vh; background: #000; }
+      .ex__pin {
+        position: sticky; top: 0; height: 100svh; overflow: hidden;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+      }
+      .ex__glow {
+        position: absolute; width: min(900px, 120vw); aspect-ratio: 1; border-radius: 50%;
+        background: radial-gradient(circle, rgba(245,196,0,0.28) 0%, rgba(245,196,0,0.07) 42%, rgba(0,0,0,0) 70%);
+        filter: blur(10px); pointer-events: none;
+      }
+      .ex__label { position: absolute; top: clamp(70px, 12vh, 120px); text-align: center; z-index: 4; padding: 0 var(--gutter); }
+      .ex__label .eyebrow { opacity: 0.9; }
+      .ex__label h2 {
+        font-size: clamp(30px, 5.6vw, 60px); font-weight: 800; letter-spacing: -0.04em; margin-top: 10px;
+      }
+      .ex__stage {
+        position: relative; z-index: 3;
+        width: min(760px, 92vw); height: min(300px, 46vw);
+        display: flex; align-items: center; justify-content: center;
+      }
+      .ex__part { position: absolute; top: 50%; left: 50%; will-change: transform; }
+      .ex__handle { width: min(420px, 52vw); transform: translate(-50%, -50%); }
+      .ex__plate { width: min(150px, 19vw); }
+      .ex__cap {
+        position: absolute; z-index: 5; left: 50%; bottom: clamp(60px, 14vh, 130px);
+        transform: translateX(-50%); width: min(620px, 90vw); text-align: center;
+        opacity: 0; transition: opacity 0.45s ease;
+      }
+      .ex__cap.on { opacity: 1; }
+      .ex__cap b {
+        display: block; font-size: clamp(18px, 3.4vw, 30px); font-weight: 700; letter-spacing: -0.02em;
+      }
+      .ex__cap span { display: block; margin-top: 8px; color: var(--grey); font-size: 15px; }
+      .ex__cap i {
+        display: block; width: 44px; height: 1px; background: var(--yellow);
+        margin: 0 auto 16px; opacity: 0.9;
+      }
+      .ex__final {
+        position: absolute; z-index: 6; inset: auto 0 auto 0; top: 50%;
+        transform: translateY(-50%); text-align: center; padding: 0 var(--gutter);
+        opacity: 0; transition: opacity 0.5s ease; pointer-events: none;
+      }
+      .ex__final.on { opacity: 1; }
+      .ex__final h3 {
+        font-size: clamp(40px, 9vw, 96px); font-weight: 800; letter-spacing: -0.045em;
+      }
+      .ex__bar {
+        position: absolute; left: 50%; transform: translateX(-50%); bottom: 26px;
+        width: min(260px, 60vw); height: 2px; background: rgba(255,255,255,0.16); border-radius: 2px; z-index: 5;
+      }
+      .ex__bar i { display: block; height: 100%; width: 0%; background: var(--yellow); border-radius: 2px; }
+
+      /* statement */
+      .say { padding: clamp(90px, 18vh, 200px) 0; }
+      .say p {
+        font-size: clamp(30px, 6.2vw, 72px); font-weight: 800;
+        letter-spacing: -0.04em; line-height: 1.08; max-width: 15ch;
+      }
+      .say .w { color: #6e6e73; transition: color 0.4s ease; }
+      .say .w.on { color: #fff; }
+
+      /* gallery */
+      .gal { display: grid; gap: 18px; margin-top: 46px; }
+      .shot { position: relative; border-radius: 24px; overflow: hidden; background: var(--graphite); }
+      .shot__frame { height: clamp(300px, 62vh, 620px); overflow: hidden; }
+      .shot img { width: 100%; height: 100%; object-fit: cover; will-change: transform; }
+      .shot figcaption {
+        position: absolute; left: 0; right: 0; bottom: 0; padding: 60px 26px 24px;
+        background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 70%);
+        font-size: clamp(16px, 2.4vw, 22px); font-weight: 600; letter-spacing: -0.015em;
+      }
+
+      /* programs */
+      .grid4 { display: grid; gap: 16px; margin-top: 46px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+      .card {
+        background: var(--graphite); border: 1px solid var(--line); border-radius: 22px;
+        padding: 28px 24px 30px; transition: transform 0.3s ease, border-color 0.3s ease;
+      }
+      .card:hover { transform: translateY(-4px); border-color: rgba(245,196,0,0.45); }
+      .card .num { font-size: 13px; font-weight: 700; color: var(--yellow); letter-spacing: 0.12em; }
+      .card h3 { margin-top: 14px; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+      .card p { margin-top: 10px; color: var(--grey); font-size: 15px; }
+      .card--photo { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+      .card__media { aspect-ratio: 4 / 5; overflow: hidden; background: var(--graphite-2); }
+      .card__media img {
+        width: 100%; height: 100%; object-fit: cover;
+        transform: scale(1.12); transition: transform 1.4s cubic-bezier(0.22,1,0.36,1);
+      }
+      .card--photo.in .card__media img { transform: scale(1); }
+      .card--photo.in:hover .card__media img { transform: scale(1.06); transition-duration: 0.6s; }
+      .card__body { padding: 22px 22px 26px; }
+      .card--photo h3 { margin-top: 10px; }
+      .card--photo p.desc { margin-top: 8px; }
+      @media (max-width: 640px) {
+        .grid4--swipe {
+          display: flex; grid-template-columns: none; overflow-x: auto;
+          scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+          margin-left: calc(-1 * var(--gutter)); margin-right: calc(-1 * var(--gutter));
+          padding: 0 var(--gutter) 8px; scroll-padding: 0 var(--gutter); scrollbar-width: none;
+        }
+        .grid4--swipe::-webkit-scrollbar { display: none; }
+        .grid4--swipe .card { flex: 0 0 80%; scroll-snap-align: start; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .card__media img, .card--photo.in:hover .card__media img { transform: none; transition: none; }
+      }
+
+      /* stats + quotes */
+      .stats { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+      .stat { border-top: 1px solid var(--line); padding-top: 20px; }
+      .stat b { display: block; font-size: clamp(44px, 8vw, 84px); font-weight: 800; letter-spacing: -0.045em; line-height: 1; }
+      .stat span { display: block; margin-top: 10px; color: var(--grey); font-size: 15px; }
+      .quotes { display: grid; gap: 16px; margin-top: 56px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+      .quote { background: var(--graphite-2); border-radius: 22px; padding: 26px 24px; }
+      .quote .stars { color: var(--yellow); font-size: 14px; letter-spacing: 0.1em; }
+      .quote p { margin-top: 14px; font-size: 17px; letter-spacing: -0.01em; }
+      .quote small { display: block; margin-top: 16px; color: var(--grey); font-size: 13px; }
+
+      /* hours */
+      .hours { margin-top: 40px; border-top: 1px solid var(--line); max-width: 620px; }
+      .hours .row {
+        display: flex; justify-content: space-between; gap: 16px; align-items: baseline;
+        padding: 18px 0; border-bottom: 1px solid var(--line);
+      }
+      .hours .row b { font-weight: 600; font-size: 17px; }
+      .hours .row span { color: var(--grey); font-variant-numeric: tabular-nums; }
+      .hours .row.closed span { color: var(--grey); }
+
+      /* visit */
+      .visit { display: grid; gap: 28px; margin-top: 46px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+      .panel { background: var(--graphite); border: 1px solid var(--line); border-radius: 24px; padding: 28px 24px; }
+      .panel h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+      .addr { margin-top: 14px; color: var(--grey); font-size: 16px; line-height: 1.6; }
+      .panel .btns { margin-top: 22px; }
+      .field { margin-top: 16px; display: block; }
+      .field span { display: block; font-size: 13px; color: var(--grey); margin-bottom: 7px; }
+      .field input, .field select {
+        width: 100%; min-height: 48px; border-radius: 12px; padding: 0 14px;
+        background: #000; color: #fff; border: 1px solid rgba(255,255,255,0.22);
+        font: inherit; font-size: 16px;
+      }
+      .field input:focus, .field select:focus { border-color: var(--yellow); outline: none; }
+      form .btn { margin-top: 22px; width: 100%; }
+      .thanks {
+        margin-top: 18px; border-radius: 16px; padding: 18px;
+        background: rgba(245,196,0,0.1); border: 1px solid rgba(245,196,0,0.4); color: #ffe483;
+        font-size: 15px;
+      }
+      .mapbox { margin-top: 40px; border-radius: 24px; overflow: hidden; border: 1px solid var(--line); background: var(--graphite); }
+      .mapbox { display: block; position: relative; }
+      .mapbox img { width: 100%; height: clamp(280px, 42vh, 420px); object-fit: cover; border-radius: 24px; transition: transform 0.6s ease; }
+      .mapbox:hover img { transform: scale(1.02); }
+      .mapbox__pill {
+        position: absolute; right: 18px; bottom: 18px; min-height: 44px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+      }
+
+      /* footer */
+      .foot { border-top: 1px solid var(--line); padding: 40px 0 60px; }
+      .foot p { color: var(--grey); font-size: 14px; }
+      .foot small { display: block; margin-top: 8px; color: var(--grey); font-size: 12px; }
+
+      @media (prefers-reduced-motion: reduce) {
+        .rev { opacity: 1; transform: none; transition: none; }
+        .say .w { color: #fff; }
+        .ex__cap, .ex__final, .ex__label { position: static; transform: none; margin: 30px auto 0; transition: none; }
+        .ex__stage { margin-top: 30px; }
+        .ex__bar { display: none; }
+        .ex { height: auto; }
+        .ex__pin { position: static; height: auto; padding: 90px 0 60px; }
+        .hero__media { transform: none !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="nav">
+      <div class="nav__in">
+        <a class="mark" href="#top">LIFE FITNESS<span>.</span></a>
+        <nav class="nav__links">
+          <a href="#floor" class="nav__hide">Floor</a>
+          <a href="#training" class="nav__hide">Training</a>
+          <a href="#visit" class="nav__hide">Visit</a>
+          <a class="pill" href="#visit">Join now</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero__media" id="heroMedia">
+          <img src="g1.jpg" alt="The Life Fitness Gym floor in Hisar, with a green turf lane and rows of machines" />
+        </div>
+        <div class="hero__scrim"></div>
+        <div class="hero__in">
+          <div class="wrap">
+            <p class="rating">★ 5.0 · 834 Google reviews</p>
+            <h1>Stronger<br />starts here.</h1>
+            <p class="hero__sub">Hisar's top-rated gym · Patel Nagar</p>
+            <div class="btns">
+              <a class="btn btn--y" href="#visit">Start your trial</a>
+              <a class="btn btn--ghost" href="https://www.google.com/maps/search/?api=1&amp;query=Life%20Fitness%20Gym%20Kaimri%20Mangali%20Rd%20Patel%20Nagar%20Hisar" target="_blank" rel="noopener">Get directions</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="ex" id="exploded">
+        <div class="ex__pin">
+          <div class="ex__glow"></div>
+          <div class="ex__label">
+            <p class="eyebrow">Every part, engineered</p>
+            <h2>Taken apart.</h2>
+          </div>
+          <div class="ex__stage" id="stage">
+            <img class="ex__part ex__plate" data-part="p-outer-l" src="gym_plate.png" alt="" />
+            <img class="ex__part ex__plate" data-part="p-inner-l" src="gym_plate.png" alt="" />
+            <img class="ex__part ex__handle" data-part="handle" src="gym_handle.png" alt="Knurled steel dumbbell handle" />
+            <img class="ex__part ex__plate" data-part="p-inner-r" src="gym_plate.png" alt="" />
+            <img class="ex__part ex__plate" data-part="p-outer-r" src="gym_plate.png" alt="Precision weight plate" />
+          </div>
+          <div class="ex__cap" data-cap="0"><i></i><b>Knurled steel grip</b><span>Locks in every rep.</span></div>
+          <div class="ex__cap" data-cap="1"><i></i><b>Precision weight plates</b><span>Balanced to the gram.</span></div>
+          <div class="ex__cap" data-cap="2"><i></i><b>Pro-grade machines</b><span>Strength and cardio zones, side by side.</span></div>
+          <div class="ex__cap" data-cap="3"><i></i><b>Coaches on the floor</b><span>Every session, not just the first one.</span></div>
+          <div class="ex__final" id="exFinal"><h3>Built for results.</h3></div>
+          <div class="ex__bar"><i id="exBar"></i></div>
+        </div>
+      </section>
+
+      <section class="say wrap" id="say">
+        <p id="sayText">Superb machines. Supportive coaches. A spotless, spacious floor. And fees that make sense.</p>
+      </section>
+
+      <section class="sec" id="floor">
+        <div class="wrap">
+          <div class="sec__head rev">
+            <p class="eyebrow">The floor</p>
+            <h2>Room to move.</h2>
+            <p class="lead">Turf for the functional work, racks and benches for the heavy days, and space between every station.</p>
+          </div>
+          <div class="gal">
+            <figure class="shot rev">
+              <div class="shot__frame"><img src="g2.jpg" alt="The turf lane and machines at Life Fitness Gym" data-par /></div>
+              <figcaption>Turf lane for sled, lunges &amp; functional work</figcaption>
+            </figure>
+            <figure class="shot rev">
+              <div class="shot__frame"><img src="g4.jpg" alt="Squat rack, bench and free weights under a motivational poster" data-par /></div>
+              <figcaption>Racks, benches and free weights — "Think training's hard? Try losing."</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" id="training">
+        <div class="wrap">
+          <div class="sec__head rev">
+            <p class="eyebrow">Training</p>
+            <h2>Four ways to train.</h2>
+          </div>
+          <div class="grid4 grid4--swipe">
+            <article class="card card--photo rev">
+              <div class="card__media"><img src="t_machines.jpg" alt="Members training on a row of plate-loaded strength machines" /></div>
+              <div class="card__body"><p class="num">01</p><h3>Strength &amp; Hypertrophy</h3><p class="desc">Progressive barbell and machine work to build real size and strength.</p></div>
+            </article>
+            <article class="card card--photo rev">
+              <div class="card__media"><img src="t_cardio.jpg" alt="Treadmill, elliptical and rower on the turf" loading="lazy" /></div>
+              <div class="card__body"><p class="num">02</p><h3>Weight Loss &amp; Conditioning</h3><p class="desc">Cardio, circuits and simple diet guidance that fits your day.</p></div>
+            </article>
+            <article class="card card--photo rev">
+              <div class="card__media"><img src="t_freeweights.jpg" alt="A member training in the free-weight corner beside a punching bag and tyre" loading="lazy" /></div>
+              <div class="card__body"><p class="num">03</p><h3>Personal Training</h3><p class="desc">One-on-one coaching with a plan written for your body and schedule.</p></div>
+            </article>
+            <article class="card card--photo rev">
+              <div class="card__media"><img src="t_turf.jpg" alt="The turf functional lane with strength frames" loading="lazy" /></div>
+              <div class="card__body"><p class="num">04</p><h3>Functional / CrossFit-style</h3><p class="desc">Sled pushes, kettlebells and turf-lane sessions for everyday power.</p></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" id="reviews">
+        <div class="wrap">
+          <div class="sec__head rev" style="margin-bottom: 46px">
+            <p class="eyebrow">What members say</p>
+            <h2>Rated 5.0 in Hisar.</h2>
+          </div>
+          <div class="stats rev">
+            <div class="stat"><b><span data-count="5.0" data-dec="1">0.0</span>★</b><span>Google rating</span></div>
+            <div class="stat"><b><span data-count="834">0</span>+</b><span>Google reviews</span></div>
+            <div class="stat"><b><span data-count="17">0</span> hrs</b><span>Open daily, Mon–Sat</span></div>
+          </div>
+          <div class="quotes">
+            <blockquote class="quote rev"><p class="stars">★★★★★</p><p>"The equipment is top-notch, and the trainers are super motivating."</p><small>Google review</small></blockquote>
+            <blockquote class="quote rev"><p class="stars">★★★★★</p><p>"Amazing Gym, Quality staff, Superb machines, Well cleaned environment."</p><small>Google review</small></blockquote>
+            <blockquote class="quote rev"><p class="stars">★★★★★</p><p>"Very nice place to workout, neat and clean… fees is also very low… coach is also very cooperative."</p><small>Google review</small></blockquote>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" id="hours">
+        <div class="wrap">
+          <div class="sec__head rev">
+            <p class="eyebrow">Hours</p>
+            <h2>Open early. Open late.</h2>
+          </div>
+          <div class="hours rev">
+            <div class="row"><b>Monday – Saturday</b><span>5:30 AM – 10:30 PM</span></div>
+            <div class="row closed"><b>Sunday</b><span>Closed</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" id="visit">
+        <div class="wrap">
+          <div class="sec__head rev">
+            <p class="eyebrow">Visit</p>
+            <h2>Come see the floor.</h2>
+          </div>
+          <div class="visit">
+            <div class="panel rev">
+              <h3>Life Fitness Gym · लाइफ फिटनेस जिम</h3>
+              <p class="addr">Kaimri–Mangali Rd, near Soni Burn Hospital,<br />Patel Nagar, Hisar, Haryana 125001</p>
+              <div class="btns">
+                <a class="btn btn--y" href="https://www.google.com/maps/search/?api=1&amp;query=Life%20Fitness%20Gym%20Kaimri%20Mangali%20Rd%20Patel%20Nagar%20Hisar" target="_blank" rel="noopener">Get directions</a>
+                <a class="btn btn--ghost" href="tel:+91XXXXXXXXXX">Call / WhatsApp +91 XXXXX XXXXX</a>
+              </div>
+            </div>
+            <div class="panel rev">
+              <h3>Book a free trial</h3>
+              <form id="trialForm" novalidate>
+                <label class="field"><span>Name</span><input type="text" name="name" required autocomplete="name" /></label>
+                <label class="field"><span>Phone</span><input type="tel" name="phone" required autocomplete="tel" /></label>
+                <label class="field"><span>Preferred time</span>
+                  <select name="time">
+                    <option>Morning (5:30 – 10:00 AM)</option>
+                    <option>Midday (10:00 AM – 4:00 PM)</option>
+                    <option>Evening (4:00 – 10:30 PM)</option>
+                  </select>
+                </label>
+                <button class="btn btn--y" type="submit">Book my free trial</button>
+              </form>
+              <p class="thanks" id="thanks" hidden></p>
+            </div>
+          </div>
+          <a class="mapbox rev" href="https://www.google.com/maps/search/?api=1&amp;query=Life%20Fitness%20Gym%20Kaimri%20Mangali%20Rd%20Patel%20Nagar%20Hisar" target="_blank" rel="noopener" aria-label="Open Life Fitness Gym in Google Maps">
+            <img src="life_fitness_map.jpg" alt="Map of Life Fitness Gym, Patel Nagar, Hisar, with a yellow marker at the gym" loading="lazy" />
+            <span class="pill mapbox__pill">Open in Google Maps ↗</span>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <div class="wrap">
+        <p>© 2026 Life Fitness Gym, Hisar</p>
+        <small>Demo concept website.</small>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        /* reveal on scroll */
+        var revs = document.querySelectorAll(".rev");
+        if ("IntersectionObserver" in window && !reduce) {
+          var io = new IntersectionObserver(
+            function (es) {
+              es.forEach(function (e) {
+                if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+              });
+            },
+            { rootMargin: "0px 0px -12% 0px", threshold: 0.12 }
+          );
+          revs.forEach(function (el) { io.observe(el); });
+        } else {
+          revs.forEach(function (el) { el.classList.add("in"); });
+        }
+
+        /* word-by-word statement */
+        var sayText = document.getElementById("sayText");
+        if (sayText) {
+          var words = sayText.textContent.trim().split(/\s+/);
+          sayText.textContent = "";
+          words.forEach(function (w, i) {
+            var el = document.createElement("span");
+            el.className = "w";
+            el.textContent = w;
+            sayText.appendChild(el);
+            if (i < words.length - 1) sayText.appendChild(document.createTextNode(" "));
+          });
+        }
+
+        /* form */
+        var form = document.getElementById("trialForm"), thanks = document.getElementById("thanks");
+        if (form) {
+          form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            var n = (form.elements.name.value || "").trim();
+            thanks.hidden = false;
+            thanks.textContent =
+              "Thanks" + (n ? ", " + n : "") + " — your free trial request is noted. The team will call you to confirm. (Demo form: nothing is sent.)";
+            form.reset();
+          });
+        }
+
+        var stage = document.getElementById("stage");
+        if (reduce) {
+          document.querySelectorAll(".say .w").forEach(function (el) { el.classList.add("on"); });
+          document.querySelectorAll(".ex__cap, .ex__final").forEach(function (el) { el.classList.add("on"); });
+          layoutParts(0.55);
+          return;
+        }
+
+        /* count-up stats */
+        var counters = document.querySelectorAll("[data-count]");
+        if ("IntersectionObserver" in window) {
+          var cio = new IntersectionObserver(function (es) {
+            es.forEach(function (e) {
+              if (!e.isIntersecting) return;
+              cio.unobserve(e.target);
+              var el = e.target, target = parseFloat(el.getAttribute("data-count")),
+                dec = parseInt(el.getAttribute("data-dec") || "0", 10), t0 = null;
+              function step(t) {
+                if (t0 === null) t0 = t;
+                var p = Math.min((t - t0) / 1400, 1), e2 = 1 - Math.pow(1 - p, 3);
+                el.textContent = (target * e2).toFixed(dec);
+                if (p < 1) requestAnimationFrame(step);
+              }
+              requestAnimationFrame(step);
+            });
+          }, { threshold: 0.4 });
+          counters.forEach(function (el) { cio.observe(el); });
+        }
+
+        /* exploded view + hero zoom + parallax, one rAF loop */
+        var ex = document.getElementById("exploded"),
+          bar = document.getElementById("exBar"),
+          fin = document.getElementById("exFinal"),
+          caps = Array.prototype.slice.call(document.querySelectorAll(".ex__cap")),
+          heroMedia = document.getElementById("heroMedia"),
+          pars = Array.prototype.slice.call(document.querySelectorAll("[data-par]")),
+          sayEl = document.getElementById("say"),
+          sayWords = Array.prototype.slice.call(document.querySelectorAll(".say .w")),
+          ticking = false;
+
+        function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+
+        function layoutParts(p) {
+          if (!stage) return;
+          var w = stage.clientWidth,
+            vw = document.documentElement.clientWidth || window.innerWidth,
+            plateEl = stage.querySelector(".ex__plate"),
+            plateW = plateEl ? plateEl.offsetWidth : w * 0.2,
+            /* keep the outer plates (rotated + scaled) fully inside the viewport */
+            maxOuter = vw / 2 - plateW * 0.75 - 14,
+            fullSpread = w * 0.42,
+            k = clamp((maxOuter - w * 0.235) / fullSpread, 0, 1),
+            spread = fullSpread * k * p,
+            inner = w * 0.17,
+            outer = w * 0.235,
+            rot = 14 * p,
+            sc = 1 + 0.06 * p;
+          set("p-inner-l", -(inner + spread * 0.62), rot, sc, 0.85);
+          set("p-outer-l", -(outer + spread), -rot, sc, 1);
+          set("p-inner-r", inner + spread * 0.62, -rot, sc, 0.85, true);
+          set("p-outer-r", outer + spread, rot, sc, 1, true);
+          var h = stage.querySelector('[data-part="handle"]');
+          if (h) h.style.transform = "translate(-50%,-50%) scale(" + (1 + 0.02 * p) + ") rotate(" + -2 * p + "deg)";
+        }
+        function set(name, dx, rot, sc, base, mirror) {
+          var el = stage.querySelector('[data-part="' + name + '"]');
+          if (!el) return;
+          el.style.transform =
+            "translate(-50%,-50%) translateX(" + dx + "px) rotate(" + rot + "deg) scale(" +
+            base * sc * (mirror ? 1 : 1) + ")" + (mirror ? " scaleX(-1)" : "");
+        }
+
+        function frame() {
+          ticking = false;
+          var vh = window.innerHeight;
+
+          if (heroMedia) {
+            var hy = clamp(window.scrollY / vh, 0, 1);
+            heroMedia.style.transform = "scale(" + (1 + hy * 0.18) + ") translateY(" + hy * 24 + "px)";
+          }
+
+          if (ex) {
+            var r = ex.getBoundingClientRect(),
+              total = ex.offsetHeight - vh,
+              p = clamp(-r.top / (total || 1), 0, 1);
+            /* 0–0.2 assembled, 0.2–0.55 explode, 0.55–0.8 hold, 0.8–1 reassemble */
+            var open;
+            if (p < 0.18) open = 0;
+            else if (p < 0.5) open = (p - 0.18) / 0.32;
+            else if (p < 0.78) open = 1;
+            else open = clamp(1 - (p - 0.78) / 0.14, 0, 1);
+            layoutParts(open * open * (3 - 2 * open));
+            if (bar) bar.style.width = (p * 100).toFixed(1) + "%";
+            var idx = p < 0.26 ? -1 : p < 0.42 ? 0 : p < 0.56 ? 1 : p < 0.68 ? 2 : p < 0.8 ? 3 : -1;
+            caps.forEach(function (c, i) { c.classList.toggle("on", i === idx); });
+            if (fin) fin.classList.toggle("on", p > 0.9);
+          }
+
+          pars.forEach(function (img) {
+            var b = img.getBoundingClientRect();
+            if (b.bottom < -100 || b.top > vh + 100) return;
+            var q = (b.top + b.height / 2 - vh / 2) / vh;
+            img.style.transform = "scale(1.12) translateY(" + (-q * 22).toFixed(2) + "px)";
+          });
+
+          if (sayEl && sayWords.length) {
+            var sb = sayEl.getBoundingClientRect(),
+              sp = clamp((vh * 0.85 - sb.top) / (sb.height + vh * 0.35), 0, 1),
+              lit = Math.round(sp * sayWords.length * 1.25);
+            sayWords.forEach(function (w, i) { w.classList.toggle("on", i < lit); });
+          }
+        }
+        function onScroll() {
+          if (!ticking) { ticking = true; requestAnimationFrame(frame); }
+        }
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("resize", onScroll);
+        frame();
+      })();
+    </script>
+  </body>
+</html>
