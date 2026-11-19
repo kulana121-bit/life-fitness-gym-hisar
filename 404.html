@@ -3,7 +3,16 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script>document.documentElement.classList.add("js");</script>
+    <script>
+      /* Scripted, but content must never depend on a script that fails to
+         arrive: if site.js has not booted in 1.5 s, reveal every section. */
+      document.documentElement.classList.add("js");
+      window.setTimeout(function () {
+        if (!window.__lfRevealReady) {
+          document.documentElement.classList.add("reveal-fallback");
+        }
+      }, 1500);
+    </script>
     <title>Page not found | Life Fitness Gym, Hisar</title>
     <meta name="description" content="That page does not exist. Head back to the Life Fitness Gym, Hisar home page or book a free trial." />
     <meta name="theme-color" content="#07080a" />

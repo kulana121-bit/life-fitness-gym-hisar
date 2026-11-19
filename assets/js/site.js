@@ -86,12 +86,18 @@
   }
 
   function reducedMotion() {
-    return (
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    );
+    try {
+      return (
+        typeof window.matchMedia === "function" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      );
+    } catch (err) {
+      // A broken matchMedia must never stop content from being shown.
+      return false;
+    }
   }
-  var supportsIO = "IntersectionObserver" in window;
+  var supportsIO =
+    typeof window.IntersectionObserver === "function" && "IntersectionObserver" in window;
 
   /* ---------------------------------------------------------------- contact */
   /* Phone and WhatsApp buttons only exist when the gym's number is filled in
@@ -308,28 +314,92 @@
   }
 
   /* ----------------------------------------------------------------- reveal */
+  /* Scroll reveals are progressive enhancement only. Content must appear even
+     if this module, IntersectionObserver, or the whole script fails. Four
+     independent safety nets, in order of how early they act:
+       1. above-the-fold .rv elements are revealed here, synchronously;
+       2. anything still pending is revealed after REVEAL_FALLBACK_MS;
+       3. `load`, `pageshow`, print and orientation changes sweep the rest;
+       4. the inline <head> script adds html.reveal-fallback if site.js never
+          boots at all. CSS handles a JS-disabled browser by itself. */
+  var REVEAL_FALLBACK_MS = 3000;
+
+  function revealAll() {
+    $$(".rv").forEach(function (el) {
+      el.classList.add("is-in");
+    });
+  }
+
   function initReveal() {
     var items = $$(".rv");
     if (!items.length) return;
-    if (!supportsIO || reducedMotion()) {
-      items.forEach(function (el) {
+    // Show what the visitor can already see, without waiting for a callback.
+    var viewport = window.innerHeight || root.clientHeight || 0;
+    var pending = [];
+    items.forEach(function (el) {
+      var box;
+      try {
+        box = el.getBoundingClientRect();
+      } catch (err) {
+        box = null;
+      }
+      // In a layout-less environment (jsdom, print, some embedded views) every
+      // rect is 0, which deliberately falls through to "show it".
+      if (!box || !viewport || box.top < viewport * 0.92) {
+        el.classList.add("is-in");
+      } else {
+        pending.push(el);
+      }
+    });
+
+    // Time-based net. It only fires while this module is alive, so it can never
+    // hide anything the CSS fallback has already made readable.
+    window.setTimeout(revealAll, REVEAL_FALLBACK_MS);
+    on(window, "load", function () {
+      window.setTimeout(revealAll, 1200);
+    });
+    on(window, "pageshow", function (e) {
+      if (e.persisted) revealAll();
+    });
+    on(window, "beforeprint", revealAll);
+    on(window, "orientationchange", function () {
+      window.setTimeout(revealAll, 600);
+    });
+
+    if (!pending.length || !supportsIO || reducedMotion()) {
+      pending.forEach(function (el) {
         el.classList.add("is-in");
       });
       return;
     }
-    var io = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-in");
-            io.unobserve(entry.target);
-          }
-        });
-      },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.08 }
-    );
-    items.forEach(function (el) {
-      io.observe(el);
+
+    var io;
+    try {
+      io = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting || entry.intersectionRatio > 0) {
+              entry.target.classList.add("is-in");
+              io.unobserve(entry.target);
+            }
+          });
+        },
+        { rootMargin: "0px 0px -8% 0px", threshold: 0.08 }
+      );
+    } catch (err) {
+      // Older or locked-down browsers: fall back to showing everything.
+      pending.forEach(function (el) {
+        el.classList.add("is-in");
+      });
+      return;
+    }
+
+    pending.forEach(function (el) {
+      try {
+        io.observe(el);
+      } catch (err) {
+        el.classList.add("is-in");
+      }
     });
   }
 
@@ -358,20 +428,24 @@
       els.forEach(run);
       return;
     }
-    var io = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            run(entry.target);
-            io.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-    els.forEach(function (el) {
-      io.observe(el);
-    });
+    try {
+      var io = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              run(entry.target);
+              io.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.5 }
+      );
+      els.forEach(function (el) {
+        io.observe(el);
+      });
+    } catch (err) {
+      els.forEach(run);
+    }
   }
 
   function initScrollProse() {
@@ -617,9 +691,11 @@
       var fig = figures[index];
       var full = fig.getAttribute("data-full");
       var caption = fig.getAttribute("data-caption") || "";
-      img.setAttribute("src", full);
-      img.setAttribute("alt", caption);
-      cap.textContent = caption;
+      if (img) {
+        img.setAttribute("src", full);
+        img.setAttribute("alt", caption);
+      }
+      if (cap) cap.textContent = caption;
       if (counter) counter.textContent = index + 1 + " / " + figures.length;
     }
     function open(i) {
@@ -686,6 +762,7 @@
     var scale = $$("[data-bmi-scale] span", box);
     var heightFt = $("[data-bmi-height-ft]", box);
     var heightIn = $("[data-bmi-height-in]", box);
+    if (!heightEl || !weightEl || !valueEl || !catEl) return;
 
     function setUnit(next) {
       unit = next;
@@ -787,7 +864,8 @@
   }
 
   function fieldWrap(input) {
-    return input.closest(".field") || input.parentNode;
+    if (!input) return null;
+    return (input.closest && input.closest(".field")) || input.parentNode || input;
   }
 
   function setError(input, message) {
@@ -1302,52 +1380,87 @@
   /* ------------------------------------------------------------------ boot */
   var booted = false;
 
+  // A single optional feature must never take the rest of the page down with
+  // it. Each module is isolated; failures are reported but do not propagate.
+  function warn(scope, err) {
+    if (window.console && typeof window.console.warn === "function") {
+      window.console.warn("[Life Fitness Gym] " + scope + " skipped:", err);
+    }
+  }
+  function safe(scope, fn) {
+    try {
+      fn();
+    } catch (err) {
+      warn(scope, err);
+    }
+  }
+
   function boot() {
     // The script is loaded with `defer`, so it can run before OR after
     // DOMContentLoaded depending on the browser. Boot exactly once.
     if (booted) return;
     booted = true;
-    applyContactLinks();
-    applyOpenState();
-    // The fixed mobile action bar must not cover the field a visitor is typing in.
-    on(doc, "focusin", function (e) {
-      var t = e.target;
-      if (t && t.closest && t.closest("form")) doc.body.classList.add("is-typing");
-    });
-    on(doc, "focusout", function (e) {
-      var t = e.target;
-      if (!t || !t.closest || !t.closest("form")) return;
-      setTimeout(function () {
-        var active = doc.activeElement;
-        if (!active || !active.closest || !active.closest("form")) doc.body.classList.remove("is-typing");
-      }, 0);
+
+    // Reveal runs first: if anything else below fails, the page is still
+    // readable. It also disarms the 1.5 s fallback in <head>.
+    try {
+      initReveal();
+    } catch (err) {
+      warn("reveal", err);
+      revealAll();
+    }
+    window.__lfRevealReady = true;
+
+    safe("contact links", applyContactLinks);
+    safe("open state", applyOpenState);
+    safe("typing-aware action bar", function () {
+      // The fixed mobile action bar must not cover the field being typed in.
+      on(doc, "focusin", function (e) {
+        var t = e.target;
+        if (t && t.closest && t.closest("form")) doc.body.classList.add("is-typing");
+      });
+      on(doc, "focusout", function (e) {
+        var t = e.target;
+        if (!t || !t.closest || !t.closest("form")) return;
+        setTimeout(function () {
+          var active = doc.activeElement;
+          if (!active || !active.closest || !active.closest("form")) {
+            doc.body.classList.remove("is-typing");
+          }
+        }, 0);
+      });
     });
     // The mobile action bar is fixed to the bottom of the viewport, so the page
     // reserves room for it on small screens.
-    if ($("[data-actionbar]")) doc.body.classList.add("has-actionbar");
-    initHeader();
-    initDrawer();
-    initReveal();
-    initCounters();
-    initScrollProse();
-    initProgrammes();
-    initSlider();
-    initLightbox();
-    initBmi();
-    initForms();
-    initCoaches();
-    initPrefill();
-    $$("[data-year]").forEach(function (el) {
-      el.textContent = LF.year || new Date().getFullYear();
+    safe("action bar", function () {
+      if ($("[data-actionbar]")) doc.body.classList.add("has-actionbar");
+    });
+    safe("header", initHeader);
+    safe("drawer", initDrawer);
+    safe("counters", initCounters);
+    safe("scroll prose", initScrollProse);
+    safe("programmes", initProgrammes);
+    safe("slider", initSlider);
+    safe("lightbox", initLightbox);
+    safe("bmi", initBmi);
+    safe("forms", initForms);
+    safe("coaches", initCoaches);
+    safe("prefill", initPrefill);
+    safe("year", function () {
+      $$("[data-year]").forEach(function (el) {
+        el.textContent = LF.year || new Date().getFullYear();
+      });
     });
     // static ticker: clone the set once so the loop is seamless
-    var tickerSet = $("[data-ticker-set]");
-    if (tickerSet && !reducedMotion()) {
-      var clone = tickerSet.cloneNode(true);
-      clone.setAttribute("aria-hidden", "true");
-      clone.removeAttribute("data-ticker-set");
-      tickerSet.parentNode.appendChild(clone);
-    }
+    safe("ticker", function () {
+      var tickerSet = $("[data-ticker-set]");
+      if (tickerSet && !reducedMotion()) {
+        var clone = tickerSet.cloneNode(true);
+        clone.setAttribute("aria-hidden", "true");
+        clone.removeAttribute("data-ticker-set");
+        tickerSet.parentNode.appendChild(clone);
+      }
+    });
   }
 
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", boot);

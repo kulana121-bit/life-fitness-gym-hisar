@@ -3,7 +3,16 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script>document.documentElement.classList.add("js");</script>
+    <script>
+      /* Scripted, but content must never depend on a script that fails to
+         arrive: if site.js has not booted in 1.5 s, reveal every section. */
+      document.documentElement.classList.add("js");
+      window.setTimeout(function () {
+        if (!window.__lfRevealReady) {
+          document.documentElement.classList.add("reveal-fallback");
+        }
+      }, 1500);
+    </script>
     <title>Gym Coaching &amp; Personal Training in Hisar | Life Fitness Gym</title>
     <meta name="description" content="Coaching at Life Fitness Gym, Hisar: technique checks, personal training for cardio, weight training and CrossFit-style sessions, plus diet guidance." />
     <meta name="theme-color" content="#07080a" />

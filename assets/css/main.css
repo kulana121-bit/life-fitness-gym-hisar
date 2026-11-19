@@ -252,7 +252,9 @@ summary {
    and a solid header instead of a transparent one. */
 html:not(.js) .nav-toggle,
 html:not(.js) .drawer,
-html:not(.js) .actionbar {
+html:not(.js) .actionbar,
+html:not(.js) .prog-preview,
+html:not(.js) .slider__nav {
   display: none !important;
 }
 html:not(.js) .site-header::before {
@@ -2371,16 +2373,38 @@ body.has-actionbar {
 }
 
 /* --------------------------------------------------- 21 Motion/reveal */
-/* Scoped to html.js: without JavaScript the content must never stay invisible. */
-html.js .rv {
-  opacity: 0;
-  transform: translateY(22px);
-  transition: opacity 0.75s var(--ease-2), transform 0.9s var(--ease);
-  transition-delay: var(--d, 0s);
+/* The hidden state is scoped to html.js so the content is readable without
+   JavaScript. The revealed selector must carry exactly the same prefix AND
+   one extra class: `html.js .rv` (0,2,1) beats `.rv.is-in` (0,2,0), which is
+   what left every revealed section stuck at opacity 0. Keep the two rules
+   paired — tools/check-reveal.mjs fails the build if the visible rule can
+   ever lose the cascade again. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js .rv {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.75s var(--ease-2), transform 0.9s var(--ease);
+    transition-delay: var(--d, 0s);
+  }
 }
-.rv.is-in {
+html.js .rv.is-in {
   opacity: 1;
   transform: none;
+}
+
+/* Fail-safe: the head script adds .reveal-fallback if site.js never boots
+   (blocked, offline, old browser, runtime error). Content is then readable
+   immediately, with no animation and no dependence on JavaScript below. */
+html.reveal-fallback .rv {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+@media (scripting: none) {
+  html.js .rv {
+    opacity: 1;
+    transform: none;
+  }
 }
 @media (hover: hover) and (pointer: fine) {
   [data-par] {
